@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.min;
+
 public class TeamSelectorAssigner implements ITeamAssigner {
 
     private final LinkedList<PlayerGroup> playerGroups = new LinkedList<>();
@@ -128,8 +130,13 @@ public class TeamSelectorAssigner implements ITeamAssigner {
         for (Player player : arena.getPlayers()) {
             if (!playersAddedToATeam.contains(player.getUniqueId())) {
                 boolean added = false;
+                //celesteMoon - only add players to the least populated team(s)
+                int minSize = (int)1e9;
                 for (ITeam team : teams) {
-                    if (team.getMembers().size() < arena.getMaxInTeam()) {
+                    minSize = min(minSize, team.getMembers().size());
+                }
+                for (ITeam team : teams) {
+                    if (team.getMembers().size() == minSize && team.getMembers().size() < arena.getMaxInTeam()) {
                         team.addPlayers(player);
                         added = true;
                         break;
